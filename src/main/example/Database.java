@@ -1,4 +1,4 @@
-package example.server;
+package example;
 
 import io.github.cdimascio.dotenv.Dotenv;
 import org.json.JSONObject;

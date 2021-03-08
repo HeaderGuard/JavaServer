@@ -1,4 +1,4 @@
-package example.server;
+package example;
 
 import com.sun.net.httpserver.HttpServer;
 
@@ -9,10 +9,9 @@ public class Server
 {
     private static String clientDir;
     private static HttpServer server;
-
+    private static final int port = 8080;
     public static void main(String[] args)
     {
-        int port = 8080;
         clientDir = "client/";
         createRoutes();
         try
@@ -30,7 +29,6 @@ public class Server
     }
     public static void createRoutes()
     {
-        int port = 8080;
         try
         {
             server = HttpServer.create(new InetSocketAddress("localhost", port), 0);
