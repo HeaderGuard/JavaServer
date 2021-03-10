@@ -8,7 +8,7 @@ class Header extends HTMLElement
     render()
     {
         this.innerHTML =
-            `<header>
+            `<header class="header">
                 <h1 class="site-title">Hello World</h1>
                 <h2 class="page-title">${this.getAttribute("pageTitle")}</h2>
             </header>`;

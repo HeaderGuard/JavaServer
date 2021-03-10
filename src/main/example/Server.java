@@ -8,6 +8,7 @@ import java.util.concurrent.Executors;
 public class Server
 {
     private static String clientDir;
+    //Server HttpServer object
     private static HttpServer server;
     private static final int port = 8080;
     public static void main(String[] args)
@@ -16,14 +17,17 @@ public class Server
         createRoutes();
         try
         {
-            //Allow the server 2 threads to run on
+            //Allow the server request 2 threads to run on
             server.setExecutor(Executors.newFixedThreadPool(2));
-            System.out.println("Server starting on " + port);
+            //Start the server on a different thread
             server.start();
+            System.out.println("Server started on " + port);
         }
         catch(Exception e)
         {
+            //Print the error and kill the server
             e.printStackTrace();
+            System.err.println(e.getMessage());
             System.exit(-1);
         }
     }
@@ -31,6 +35,7 @@ public class Server
     {
         try
         {
+            //Initialize the server at IP address localhost on port 8080
             server = HttpServer.create(new InetSocketAddress("localhost", port), 0);
 
             //Files we need to serve
@@ -53,6 +58,7 @@ public class Server
             System.exit(-1);
         }
     }
+    //just for convenience of not having to write client every time we route a file on the client
     public static String route(String file)
     {
         return clientDir + file;

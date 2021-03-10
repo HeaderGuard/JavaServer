@@ -1,6 +1,13 @@
 html
 {
+    margin: 0;
+    padding: 0;
     background-color: black;
+}
+.header
+{
+    margin: 20px;
+    padding: 20px;
 }
 .site-title
 {
@@ -15,4 +22,18 @@ html
     display: flex;
     justify-content: center;
     font-size: 45px;
+}
+main
+{
+    text-align: center;
+    color: whitesmoke;
+}
+.login
+{
+    margin: 20px;
+    padding: 20px;
+    display: inline-block;
+    justify-content: center;
+    color: aqua;
+    background: purple;
 }
