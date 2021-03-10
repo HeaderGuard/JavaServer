@@ -13,7 +13,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
 
 //External dependency for JSON Objects, really just a more specialized HashMap
-import org.json.*;
+//import org.json.*;
 
 public class Router implements HttpHandler
 {
@@ -47,6 +47,7 @@ public class Router implements HttpHandler
                 request.append(scanner.nextLine());
             }
             JSONObject json = new JSONObject(request.toString());
+            System.out.println(json.toString());
             if(path.contains("/users"))
             {
                 //Create a Database Object passing the endpoint and json data
