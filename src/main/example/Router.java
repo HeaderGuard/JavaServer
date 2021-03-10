@@ -12,9 +12,6 @@ import java.nio.charset.StandardCharsets;
 //InputStreams, FileStreams, etc...
 import java.util.Scanner;
 
-//External dependency for JSON Objects, really just a more specialized HashMap
-//import org.json.*;
-
 public class Router implements HttpHandler
 {
     //Path to file or api endpoint

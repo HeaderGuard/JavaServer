@@ -60,14 +60,6 @@ public class JSONObject extends HashMap<String, Object>
     {
         return Integer.parseInt(this.getString(key));
     }
-    public double getDouble(String key)
-    {
-        return Double.parseDouble(this.getString(key));
-    }
-    public float getFloat(String key)
-    {
-        return Float.parseFloat(this.getString(key));
-    }
     public String getString(String key)
     {
         return this.get(key).toString();

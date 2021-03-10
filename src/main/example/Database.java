@@ -2,8 +2,6 @@ package example;
 
 //You thought I was giving you my database login information
 import io.github.cdimascio.dotenv.Dotenv;
-//JSON Objects
-//import org.json.JSONObject;
 
 //SQL
 import java.sql.*;

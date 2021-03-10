@@ -5,8 +5,6 @@ Dependencies used
 
 Postgres Java Connector - To connect to Postgres: https://jdbc.postgresql.org/
 
-org.json - To make JSON responses easier: https://github.com/stleary/JSON-java
-
 Java-dotenv - To hide my Postgresql username and password: https://github.com/cdimascio/java-dotenv
 
 Classes: 
@@ -17,8 +15,9 @@ Router - actually directing the request and sending either html/css/javascript/j
 
 Database - the part where we interact with the database by using functions called based on the API endpoint with the /users prefix
 
+JSONObject - used to turn Strings into JSON objects and back into JSON strings
 
-Database: PostgresSQL
+Database used: PostgresSQL
 
 
 To compile and run:
