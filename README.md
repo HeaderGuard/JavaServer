@@ -22,8 +22,6 @@ Database used: PostgresSQL
 
 To compile and run:
 
-mvn clean compile
-
-mvn clean package
+make
 
 java -jar target/JavaServer-1.0.jar
