@@ -30,79 +30,23 @@ public class Database implements Runnable
         this.data = new ArrayList<>();
     }
 
-    //Does an SQL Query to add a user
-    public void addUser()
+    private void prepStatement(String query, String type)
     {
-        String name = this.json.getString("name");
-        int age = this.json.getInt("age");
         try
         {
-            //Prepared statement is more clean
-            PreparedStatement statement = connection.prepareStatement("INSERT INTO users (name, age) VALUES ('"+ name + "', " + age + ");");
-            //Stop if we get nothing in 10 seconds
-            statement.setQueryTimeout(10);
-            statement.executeUpdate();
-            System.out.println("User created");
-            statement.close();
-        }
-        catch(Exception e)
-        {
-            error(e);
-        }
-    }
-
-    public void findUser()
-    {
-        String name = json.getString("name");
-        try
-        {
-            String query = "SELECT * FROM users WHERE name = '" + name + "';";
             PreparedStatement statement = connection.prepareStatement(query);
             //Stop if we get nothing in 10 seconds
             statement.setQueryTimeout(10);
-            ResultSet rs = statement.executeQuery();
-            resultsToJSON(rs);
-            System.out.println("Users found");
+            switch(type)
+            {
+                case "create": statement.executeUpdate(); break;
+                case "read":
+                case "delete": resultsToJSON(statement.executeQuery()); break;
+                case "update": statement.execute(); break;
+            }
             statement.close();
         }
-        catch(Exception e)
-        {
-            error(e);
-        }
-    }
-
-    private void updateUser()
-    {
-        String name = this.json.getString("name");
-        int newAge = this.json.getInt("age");
-        try
-        {
-            PreparedStatement statement = connection.prepareStatement("UPDATE USERS SET age = " + newAge + " WHERE name = '" + name + "';");
-            //Stop if we get nothing in 10 seconds
-            statement.setQueryTimeout(10);
-            statement.execute();
-            System.out.println("User updated");
-            statement.close();
-        }
-        catch(Exception e)
-        {
-            error(e);
-        }
-    }
-
-    private void deleteUser()
-    {
-        String name = this.json.getString("name");
-        try
-        {
-            PreparedStatement statement = connection.prepareStatement("DELETE FROM USERS WHERE name = '" + name + "' RETURNING *;");
-            //Stop if we get nothing in 10 seconds
-            statement.setQueryTimeout(10);
-            resultsToJSON(statement.executeQuery());
-            System.out.println("User deleted");
-            statement.close();
-        }
-        catch(Exception e)
+        catch (Exception e)
         {
             error(e);
         }
@@ -159,17 +103,30 @@ public class Database implements Runnable
             switch (endpoint)
             {
                 case "/users/add":
-                    addUser();
+                {
+                    String name = this.json.getString("name");
+                    int age = this.json.getInt("age");
+                    prepStatement("INSERT INTO users (name, age) VALUES ('"+ name + "', " + age + ");", "create");
                     break;
+                }
                 case "/users/find":
-                    findUser();
+                {
+                    String name = this.json.getString("name");
+                    prepStatement("SELECT * FROM users WHERE name = '" + name + "';", "read");
                     break;
+                }
                 case "/users/update":
-                    updateUser();
-                    break;
+                {
+                    String name = this.json.getString("name");
+                    int newAge = this.json.getInt("age");
+                    prepStatement("UPDATE USERS SET age = " + newAge + " WHERE name = '" + name + "';", "update");
+                }
                 case "/users/delete":
-                    deleteUser();
+                {
+                    String name = this.json.getString("name");
+                    prepStatement("DELETE FROM USERS WHERE name = '" + name + "' RETURNING *;", "delete");
                     break;
+                }
             }
             //close the database connection
             connection.close();
