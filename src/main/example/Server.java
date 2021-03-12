@@ -43,6 +43,7 @@ public class Server
             server.createContext("/ez", new Router(route("ez.html")));
             server.createContext("/styles/style.css", new Router(route("styles/style.css")));
             server.createContext("/javascript/components/Header.js", new Router(route("javascript/components/Header.js")));
+            server.createContext("/javascript/components/Nav.js", new Router(route("javascript/components/Nav.js")));
             server.createContext("/javascript/test.js", new Router(route("javascript/test.js")));
 
             //API Endpoints

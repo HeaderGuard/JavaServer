@@ -3,6 +3,7 @@ html
     margin: 0;
     padding: 0;
     background-color: black;
+    color: whitesmoke;
 }
 .header
 {
@@ -23,15 +24,29 @@ html
     justify-content: center;
     font-size: 45px;
 }
+.bar-links
+{
+    display: flex;
+    justify-content: space-evenly;
+    list-style: none;
+}
+.bar-link
+{
+    text-decoration: none;
+    color: red;
+}
+.bar-link:hover
+{
+    color: green;
+}
 main
 {
     text-align: center;
-    color: whitesmoke;
 }
 .login
 {
-    margin: 20px;
-    padding: 20px;
+    margin: 5em;
+    padding: 5em;
     display: inline-block;
     justify-content: center;
     color: aqua;
