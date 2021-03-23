@@ -9,8 +9,8 @@ import java.io.*;
 
 //Specify UTF-8 just to be safe
 import java.nio.charset.StandardCharsets;
-//InputStreams, FileStreams, etc...
-import java.util.Scanner;
+
+import static example.Utils.error;
 
 public class Router implements HttpHandler
 {
@@ -22,78 +22,85 @@ public class Router implements HttpHandler
         this.path = path;
     }
 
-    //Required by HttpHandler
     @Override
-    public void handle(HttpExchange req) throws IOException
+    public void handle(HttpExchange req)
     {
-        if(req.getRequestMethod().equals("GET"))
+        try
         {
-            //Get code from the file and send it back as an OutputStream with a response code of 200
-            String code = getFile();
-            req.sendResponseHeaders(200, code.length());
-            OutputStream stream = req.getResponseBody();
-            stream.write(code.getBytes(StandardCharsets.UTF_8));
-            stream.close();
+            String reqMethod = req.getRequestMethod();
+            if(reqMethod.equals("GET"))
+            {
+                response(req, Utils.readFile(path), 200);
+            }
+            else if(reqMethod.equals("POST"))
+            {
+                JSONObject json = new JSONObject(Utils.readStream(req.getRequestBody()));
+                System.out.println(json.toString());
+                if(path.contains("/users"))
+                {
+                    //Create a Database Object passing the endpoint and json data
+                    Database db = new Database(path, json);
+                    //Create a new Thread to run what we need with the Database class
+                    Thread task = new Thread(db);
+                    //Call db.run() on a new thread
+                    task.start();
+                    try
+                    {
+                        //We need to get the response JSON from the other thread so we join them and call a function
+                        task.join();
+                        //Create a response from the JSON and send as an OutputStream with status code of 200
+                        response(req, db.getJson(), 200);
+                    }
+                    catch (InterruptedException e)
+                    {
+                        error(e);
+                    }
+                }
+                else
+                {
+                    JSONObject res = new JSONObject();
+                    json.put("message", "endpoint not registered");
+                    response(req, res, 404);
+                }
+            }
         }
-        else if(req.getRequestMethod().equals("POST"))
+        catch (Exception e)
         {
-            StringBuilder request = new StringBuilder();
-            Scanner scanner = new Scanner(req.getRequestBody());
-            while(scanner.hasNextLine())
-            {
-                request.append(scanner.nextLine());
-            }
-            JSONObject json = new JSONObject(request.toString());
-            System.out.println(json.toString());
-            if(path.contains("/users"))
-            {
-                //Create a Database Object passing the endpoint and json data
-                Database db = new Database(path, json);
-                //Create a new Thread to run what we need with the Database class
-                Thread task = new Thread(db);
-                //Call db.run() on a new thread
-                task.start();
-                try
-                {
-                    //We need to get the response JSON from the other thread so we join them and call a function
-                    task.join();
-                    //Create the response String data from the JSON and send as an OutputStream with res code of 200
-                    String res = db.getJson().toString();
-                    req.sendResponseHeaders(200, res.length());
-                    OutputStream stream = req.getResponseBody();
-                    stream.write(res.getBytes(StandardCharsets.UTF_8));
-                    stream.close();
-                }
-                catch (InterruptedException e)
-                {
-                    e.printStackTrace();
-                    System.err.println(e.getMessage());
-                    System.exit(-1);
-                }
-            }
+            error(e);
         }
     }
 
-    private String getFile()
+    //Response for files
+    public void response(HttpExchange req, String code, int statusCode)
     {
-        //Read the file line by line
-        StringBuilder code = new StringBuilder();
         try
         {
-            Scanner reader = new Scanner(new File(path));
-            while(reader.hasNextLine())
-            {
-                code.append(reader.nextLine());
-            }
-            reader.close();
+            //Get code from the file and send it back as an OutputStream with a response code of 200
+            req.sendResponseHeaders(statusCode, code.length());
+            OutputStream os = req.getResponseBody();
+            os.write(code.getBytes(StandardCharsets.UTF_8));
+            os.close();
         }
-        catch (FileNotFoundException e)
+        catch (IOException e)
         {
-            //error handling
-            System.err.println(e.getMessage());
-            e.printStackTrace();
-            System.exit(-1);
+            error(e);
         }
-        return code.toString();
+    }
+
+    //Response for JSON
+    private void response(HttpExchange req, JSONObject json, int statusCode)
+    {
+        try
+        {
+            String res = json.toString();
+            req.sendResponseHeaders(statusCode, res.length());
+            OutputStream stream = req.getResponseBody();
+            stream.write(res.getBytes(StandardCharsets.UTF_8));
+            stream.close();
+        }
+        catch (IOException e)
+        {
+            error(e);
+        }
     }
 }

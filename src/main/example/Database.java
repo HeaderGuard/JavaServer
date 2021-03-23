@@ -1,8 +1,5 @@
 package example;
 
-//You thought I was giving you my database login information
-import io.github.cdimascio.dotenv.Dotenv;
-
 //SQL
 import java.sql.*;
 //ArrayList of JSON Objects
@@ -10,6 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 //Make sure DB_URL isn't null
 import java.util.Objects;
+
+import static example.Utils.error;
 
 //Implementing runnable so we can multi thread
 public class Database implements Runnable
@@ -93,11 +92,11 @@ public class Database implements Runnable
         try
         {
             //Read the variables from our environment variables file
-            Dotenv dotenv = Dotenv.load();
+            JSONObject env = Utils.getEnv(".env");
             //Find the JAR file for PostgreSQL
             Class.forName("org.postgresql.Driver");
             //Connect to the database
-            connection = DriverManager.getConnection(Objects.requireNonNull(dotenv.get("DB_URL")), dotenv.get("DB_USER"), dotenv.get("DB_PASS"));
+            connection = DriverManager.getConnection(Objects.requireNonNull(env.getString("DB_URL")), env.getString("DB_USER"), env.getString("DB_PASS"));
             System.out.println("Connected to Database on new thread");
             //Decide what function to call based on the API endpoint
             switch (endpoint)
@@ -135,11 +134,5 @@ public class Database implements Runnable
         {
             error(e);
         }
-    }
-    private void error(Exception e)
-    {
-        e.printStackTrace();
-        System.err.println(e.getMessage());
-        System.exit(-1);
     }
 }
