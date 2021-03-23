@@ -7,6 +7,8 @@ import java.util.concurrent.Executors;
 
 import static example.Utils.error;
 
+import static example.Utils.staticFolder;
+
 public class Server
 {
     private static final int port = 8080;
@@ -19,7 +21,7 @@ public class Server
             //Allow the server request 2 threads to run on
             server.setExecutor(Executors.newFixedThreadPool(2));
             //Static folder
-            Utils.staticFolder(server, "client/");
+            staticFolder(server, "client/");
             //API Endpoints
             server.createContext("/users/add", new Router("/users/add"));
             server.createContext("/users/find", new Router("/users/find"));

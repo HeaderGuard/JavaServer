@@ -11,6 +11,8 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 
 import static example.Utils.error;
+import static example.Utils.readFile;
+import static example.Utils.readStream;
 
 public class Router implements HttpHandler
 {
@@ -30,11 +32,18 @@ public class Router implements HttpHandler
             String reqMethod = req.getRequestMethod();
             if(reqMethod.equals("GET"))
             {
-                response(req, Utils.readFile(path), 200);
+                String code = readFile(path);
+                if(code.length() == 0)
+                {
+                    JSONObject res = new JSONObject();
+                    res.put("message", "endpoint not registered");
+                    response(req, res, 404);
+                }
+                response(req, code, 200);
             }
             else if(reqMethod.equals("POST"))
             {
-                JSONObject json = new JSONObject(Utils.readStream(req.getRequestBody()));
+                JSONObject json = new JSONObject(readStream(req.getRequestBody()));
                 System.out.println(json.toString());
                 if(path.contains("/users"))
                 {
