@@ -22,8 +22,10 @@ User - a schema template for users, not yet completed nor implemented
 Database used: PostgresSQL
 
 
-To compile and run:
+To compile:
 
 make
+
+To run:
 
 java -jar target/JavaServer-1.0.jar
