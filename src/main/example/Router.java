@@ -32,7 +32,7 @@ public class Router implements HttpHandler
             String reqMethod = req.getRequestMethod();
             if(reqMethod.equals("GET"))
             {
-                String code = readFile(path);
+                String code = readFile(new File(path));
                 if(code.length() == 0)
                 {
                     JSONObject res = new JSONObject();
@@ -43,7 +43,7 @@ public class Router implements HttpHandler
             }
             else if(reqMethod.equals("POST"))
             {
-                JSONObject json = new JSONObject(readStream(req.getRequestBody()));
+                JSONObject json = new JSONObject(readFile(req.getRequestBody()));
                 System.out.println(json.toString());
                 if(path.contains("/users"))
                 {

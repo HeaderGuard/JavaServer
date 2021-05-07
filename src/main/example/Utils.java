@@ -9,15 +9,25 @@ import java.util.Scanner;
 
 public class Utils
 {
-    public static String readFile(final String path)
+    public static <Stream> String readFile(final Stream stream)
     {
         //Read the file line by line
         StringBuilder code = new StringBuilder();
         try
         {
-            Scanner reader = new Scanner(new File(path));
-            while(reader.hasNextLine())
+            Scanner reader = null;
+            if(stream instanceof File)
             {
+                reader = new Scanner((File) stream);
+            }
+            else if(stream instanceof InputStream)
+            {
+                reader = new Scanner((InputStream) stream);
+            }
+            while(true)
+            {
+                assert reader != null;
+                if (!reader.hasNextLine()) break;
                 code.append(reader.nextLine());
             }
             reader.close();
@@ -27,26 +37,6 @@ public class Utils
             error(e);
         }
         return code.toString();
-    }
-
-    public static String readStream(final InputStream is)
-    {
-        //Read the input stream
-        StringBuilder data = new StringBuilder();
-        try
-        {
-            Scanner reader = new Scanner(is);
-            while(reader.hasNextLine())
-            {
-                data.append(reader.nextLine());
-            }
-            reader.close();
-        }
-        catch (Exception e)
-        {
-            error(e);
-        }
-        return data.toString();
     }
 
     //Get all the html css and javascript files we need and serve them if we have a directory make a recursive call
@@ -83,7 +73,7 @@ public class Utils
 
     public static JSONObject getEnv(final String path)
     {
-        return new JSONObject(readFile(path));
+        return new JSONObject(readFile(new File(path)));
     }
 
     //error handling for debugging

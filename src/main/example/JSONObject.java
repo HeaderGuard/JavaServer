@@ -1,6 +1,7 @@
 package example;
 
 import java.util.HashMap;
+import java.util.Objects;
 
 public class JSONObject extends HashMap<String, Object>
 {
@@ -58,11 +59,11 @@ public class JSONObject extends HashMap<String, Object>
     }
     public int getInt(String key)
     {
-        return Integer.parseInt(this.getString(key));
+        return Integer.parseInt(getString(key));
     }
     public String getString(String key)
     {
-        return this.get(key).toString();
+        return Objects.requireNonNull(get(key)).toString();
     }
     @Override
     public String toString()
