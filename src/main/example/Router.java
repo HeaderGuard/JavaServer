@@ -18,20 +18,20 @@ public class Router implements HttpHandler
     //Path to file or api endpoint
     private final String path;
     private final String contentType;
-    public Router(String path)
+    public Router(final String path)
     {
         this.path = path;
         this.contentType = "application/json";
     }
 
-    public Router(String path, String contentType)
+    public Router(final String path, final String contentType)
     {
         this.path = path;
         this.contentType = contentType;
     }
 
     @Override
-    public void handle(HttpExchange req)
+    public void handle(final HttpExchange req)
     {
         try
         {
@@ -41,22 +41,20 @@ public class Router implements HttpHandler
                 String code = readFile(new File(path));
                 if(code.length() == 0)
                 {
-                    JSONObject res = new JSONObject();
-                    res.put("message", "endpoint not registered");
-                    response(req, res, 404);
+                    response(req, "{message: endpoint not registered}", 404);
                 }
                 response(req, code, 200);
             }
             else if(reqMethod.equals("POST"))
             {
-                JSONObject json = new JSONObject(readFile(req.getRequestBody()));
+                final JSONObject json = new JSONObject(readFile(req.getRequestBody()));
                 System.out.println(json.toString());
                 if(path.contains("/users"))
                 {
                     //Create a Database Object passing the endpoint and json data
-                    Database db = new Database(path, json);
+                    final Database db = new Database(path, json);
                     //Create a new Thread to run what we need with the Database class
-                    Thread task = new Thread(db);
+                    final Thread task = new Thread(db);
                     //Call db.run() on a new thread
                     task.start();
                     try
@@ -64,7 +62,7 @@ public class Router implements HttpHandler
                         //We need to get the response JSON from the other thread so we join them and call a function
                         task.join();
                         //Create a response from the JSON and send as an OutputStream with status code of 200
-                        response(req, db.getJson(), 200);
+                        response(req, db.getJson().toString(), 200);
                     }
                     catch (InterruptedException e)
                     {
@@ -73,9 +71,7 @@ public class Router implements HttpHandler
                 }
                 else
                 {
-                    JSONObject res = new JSONObject();
-                    json.put("message", "endpoint not registered");
-                    response(req, res, 404);
+                    response(req, "{message: endpoint not registered}", 404);
                 }
             }
         }
@@ -86,35 +82,16 @@ public class Router implements HttpHandler
     }
 
     //Response for files
-    public void response(HttpExchange req, String code, int statusCode)
+    public void response(final HttpExchange req, final String res, final int statusCode)
     {
         try
         {
             //Get code from the file and send it back as an OutputStream with a response code of 200
-            OutputStream os = req.getResponseBody();
+            final OutputStream os = req.getResponseBody();
             req.getResponseHeaders().add("Content-Type", contentType);
-            req.sendResponseHeaders(statusCode, code.length());
-            os.write(code.getBytes(StandardCharsets.UTF_8));
+            req.sendResponseHeaders(statusCode, res.length());
+            os.write(res.getBytes(StandardCharsets.UTF_8));
             os.close();
-        }
-        catch (IOException e)
-        {
-            error(e);
-        }
-    }
-
-    //Response for JSON
-    private void response(HttpExchange req, JSONObject json, int statusCode)
-    {
-        try
-        {
-            String res = json.toString();
-            req.sendResponseHeaders(statusCode, res.length());
-            OutputStream stream = req.getResponseBody();
-            req.getResponseHeaders().add("Content-Type", contentType);
-            req.sendResponseHeaders(statusCode, res.length());
-            stream.write(res.getBytes(StandardCharsets.UTF_8));
-            stream.close();
         }
         catch (IOException e)
         {
