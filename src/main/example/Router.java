@@ -12,16 +12,22 @@ import java.nio.charset.StandardCharsets;
 
 import static example.Utils.error;
 import static example.Utils.readFile;
-import static example.Utils.readStream;
 
 public class Router implements HttpHandler
 {
     //Path to file or api endpoint
     private final String path;
-
+    private final String contentType;
     public Router(String path)
     {
         this.path = path;
+        this.contentType = "application/json";
+    }
+
+    public Router(String path, String contentType)
+    {
+        this.path = path;
+        this.contentType = contentType;
     }
 
     @Override
@@ -85,8 +91,9 @@ public class Router implements HttpHandler
         try
         {
             //Get code from the file and send it back as an OutputStream with a response code of 200
-            req.sendResponseHeaders(statusCode, code.length());
             OutputStream os = req.getResponseBody();
+            req.getResponseHeaders().add("Content-Type", contentType);
+            req.sendResponseHeaders(statusCode, code.length());
             os.write(code.getBytes(StandardCharsets.UTF_8));
             os.close();
         }
@@ -104,6 +111,8 @@ public class Router implements HttpHandler
             String res = json.toString();
             req.sendResponseHeaders(statusCode, res.length());
             OutputStream stream = req.getResponseBody();
+            req.getResponseHeaders().add("Content-Type", contentType);
+            req.sendResponseHeaders(statusCode, res.length());
             stream.write(res.getBytes(StandardCharsets.UTF_8));
             stream.close();
         }

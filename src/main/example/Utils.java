@@ -5,6 +5,8 @@ import com.sun.net.httpserver.HttpServer;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
 
 public class Utils
@@ -42,9 +44,15 @@ public class Utils
     //Get all the html css and javascript files we need and serve them if we have a directory make a recursive call
     public static void staticFolder(final HttpServer server, final String dir)
     {
+        final Map<String, String> contentTypes = new HashMap<>()
+        {{
+            put(".html", "text/html");
+            put(".css", "text/css");
+            put(".js", "text/javascript");
+        }};
         try
         {
-            final String clientDir = "/client";
+            final String rootDir = "/client";
             File[] files = new File(dir).listFiles();
             assert files != null;
             for(File file : files)
@@ -57,11 +65,11 @@ public class Utils
                 String path = file.getPath();
                 if(!path.contains("index.html") && !isDir)
                 {
-                    server.createContext("/" + path.substring(clientDir.length(), path.indexOf('.')), new Router(path));
+                    server.createContext("/" + path.substring(rootDir.length(), path.indexOf('.')), new Router(path, contentTypes.get(path.substring(path.indexOf(".")))));
                 }
                 else if(path.contains("index.html"))
                 {
-                    server.createContext("/", new Router(path));
+                    server.createContext("/", new Router(path, contentTypes.get(".html")));
                 }
             }
         }
