@@ -1,8 +1,6 @@
 JavaServer:
-	mvn clean compile
 	mvn clean package
 regular:
-	mvn compile
 	mvn package
 run:
 	make regular
